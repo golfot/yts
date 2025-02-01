@@ -44,7 +44,7 @@ export async function describeImage(img) {
                     fileUri: uploadResult.file.uri
                 }
             },
-            { text: "" },
+            { text: "Fokus langsung kasih judul nya saja tanpa bertele-tele" },
         ])
 
         // delete image from cloud
@@ -70,7 +70,7 @@ export async function getRoast(img = '') {
         console.log('Processing image:', img); // Log informasi gambar
         const imageDesc = await describeImage(img);
         console.log('Image description:', imageDesc); // Log deskripsi gambar
-        const prompt = `Analisis gambar berikut dan ekstrak teks yang ada. Berikan jawaban terbaik berdasarkan konteks. Kemudian, buatkan 10 judul video Shorts yang menarik perhatian dan dapat memikat penonton untuk menontonnya pakai bahasa indonesia. Setiap judul harus maksimal 55 karakter dan sertakan emotikon untuk meningkatkan daya tariknya.
+        const prompt = `Analisis gambar berikut dan ekstrak teks yang ada. Berikan jawaban terbaik berdasarkan konteks. Kemudian, buatkan 20 judul video Shorts yang menarik perhatian dan dapat memikat penonton dan Buatlah Singkat dan Menarik dan Bangkitkan Rasa Penasaran untuk menontonnya pakai bahasa indonesia. Setiap judul harus maksimal 55 karakter dan sertakan emotikon untuk meningkatkan daya tariknya.
         
         ${imageDesc}
     `
