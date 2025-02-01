@@ -44,7 +44,7 @@ export async function describeImage(img) {
                     fileUri: uploadResult.file.uri
                 }
             },
-            { text: "Describe the image with a general explanation. If the image contains a question, identify the type of question and provide the appropriate answer according to the context, such as math, physics, or other subjects" },
+            { text: "" },
         ])
 
         // delete image from cloud
