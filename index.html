@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Roaster</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        #uploadForm {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .file-upload {
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            padding: 10px 20px;
+            display: inline-block;
+            cursor: pointer;
+            background-color: #3498db;
+            color: #fff;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+        .file-upload:hover {
+            background-color: #2980b9;
+        }
+        button {
+            background-color: #2ecc71;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #27ae60;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+        #result strong {
+            font-weight: bold;
+        }
+        #result em {
+            font-style: italic;
+        }
+        #imagePreview {
+            max-width: 100%;
+            height: auto;
+            margin: 20px auto;
+            border-radius: 8px;
+            display: none;
+            max-height: 400px;
+            object-fit: contain;
+        }
+        .loading {
+            text-align: center;
+            display: none;
+        }
+        .loading:after {
+            content: '.';
+            animation: dots 1s steps(5, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+        blockquote {
+            background-color: #f9f9f9;
+            border-left: 5px solid #ccc;
+            margin: 1.5em 10px;
+            padding: 0.5em 10px;
+            quotes: "\201C""\201D""\2018""\2019";
+            font-style: italic;
+        }
+        blockquote:before {
+            color: #ccc;
+            content: open-quote;
+            font-size: 4em;
+            line-height: 0.1em;
+            margin-right: 0.25em;
+            vertical-align: -0.4em;
+        }
+        blockquote p {
+            display: inline;
+        }
+        @media (max-width: 600px) {
+            .file-upload, button {
+                display: block;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Image Roaster 🔥</h1>
+        <small>
+            <blockquote>
+                Foto akan langsung di hapus jadi tenang aja gabakal bocor dan gabakal
+                bisa dilihat orang lain. source:
+                <a href="https://github.com/kevintherm/image-roaster/blob/main/roast.js#L31-L35">Sumber</a>
+            </blockquote>
+        </small>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <label for="imageUpload" class="file-upload">Choose Image</label>
+            <input id="imageUpload" type="file" name="image" accept="image/*" required>
+            <button type="submit">Get Roasted!</button>
+        </form>
+        <img id="imagePreview" src="" alt="Image preview">
+        <div class="loading" id="loading">Roasting in progress</div>
+        <div id="result"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/compress.js"></script>
+    <script>
+        const form = document.getElementById('uploadForm');
+        const imageUpload = document.getElementById('imageUpload');
+        const imagePreview = document.getElementById('imagePreview');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+
+        imageUpload.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const compress = new Compress();
+                const compressedImage = await compress.compress([file], {
+                    size: 2, // Ukuran dalam MB
+                    quality: 0.75, // Kualitas
+                    maxWidth: 800, // Lebar maksimum
+                    maxHeight: 800, // Tinggi maksimum
+                    resize: true // Resize gambar
+                });
+
+                const img = compressedImage[0];
+                const base64str = img.data;
+                const imgExt = img.ext;
+
+                // Tampilkan gambar preview
+                imagePreview.src = `data:image/${imgExt};base64,${base64str}`;
+                imagePreview.style.display = 'block';
+
+                // Ganti file input dengan file yang sudah dikompres
+                const newFile = await fetch(`data:image/${imgExt};base64,${base64str}`)
+                    .then(res => res.blob())
+                    .then(blob => new File([blob], file.name, { type: `image/${imgExt}` }));
+
+                // Ganti file input dengan file baru
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(newFile);
+                imageUpload.files = dataTransfer.files;
+            }
+        });
+
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            roast.innerHTML = "";
+            button.disabled = true;
+
+            loading.style.opacity = 1;
+
+            const data = new FormData();
+            data.append("file", photo.files[0]); // Pastikan ini sesuai dengan nama field di server
+
+            fetch("/roast", {
+                method: "POST",
+                body: data,
+            })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (data.ok) {
+                    preview.style.opacity = 1;
+                    preview.style.height = "100%";
+                    loading.style.opacity = 0;
+                    form.reset();
+                    roast.innerHTML = marked.parse(data.text);
+                } else {
+                    loading.style.opacity = 0;
+                    roast.innerHTML = "Gagal mengunggah file: " + data.error; // Tampilkan pesan kesalahan
+                }
+                button.disabled = false;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                loading.style.opacity = 0;
+                roast.innerHTML = "Terjadi kesalahan. Silakan coba lagi.";
+                button.disabled = false;
+            });
+        };
+
+        function linkify(text) {
+            // Regex untuk mendeteksi URL biasa dan URL dalam format markdown
+            const urlRegex = /(\[([^\]]+)\]\(https?:\/\/[^\s\)]+\))|((https?:\/\/[^\s]+))/g;
+            
+            // Ubah URL menjadi link yang bisa diklik
+            text = text.replace(urlRegex, function(match, p1, p2, p3, p4) {
+                if (p1) {
+                    // Ini adalah link markdown
+                    const parts = p1.match(/\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/);
+                    return `<a href="${parts[2]}" target="_blank">${parts[1]}</a>`;
+                } else {
+                    // Ini adalah URL biasa
+                    return `<a href="${p4}" target="_blank">${p4}</a>`;
+                }
+            });
+
+            // Ubah ** menjadi teks tebal
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            // Ubah * menjadi teks miring
+            text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+            return text;
+        }
+    </script>
+</body>
+</html>
