@@ -44,7 +44,7 @@ export async function describeImage(img) {
                     fileUri: uploadResult.file.uri
                 }
             },
-            { text: "Fokus langsung kasih judul nya saja tanpa bertele-tele" },
+            { text: "" },
         ])
 
         // delete image from cloud
@@ -70,7 +70,7 @@ export async function getRoast(img = '') {
         console.log('Processing image:', img); // Log informasi gambar
         const imageDesc = await describeImage(img);
         console.log('Image description:', imageDesc); // Log deskripsi gambar
-        const prompt = `Buatkan 20 judul video Shorts yang menarik 50 karakter, pakai emoticon nada bicaranya seperti perempuan.
+        const prompt = `Buatkan 20 judul YouTube Shorts berdasarkan gambar yang diunggah. Nada harus seperti perempuan akun gosip—kadang lucu, kadang kesel, kadang sedih, sesuai dengan konteks gambar. Judul maksimal 60 karakter, menarik, relevan, dan nggak pakai clickbait. Tambahkan emotikon di akhir kalimat untuk memperkuat ekspresi. Kalau ada sesuatu yang bikin gregetan, kasih sentuhan dramatis yang pas, tapi tetap natural!
         
         ${imageDesc}
     `
